@@ -1,0 +1,21 @@
+package com.data.datafacturador.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * DTO para request de login
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoginRequest {
+
+    @NotBlank(message = "El username es obligatorio")
+    private String username;
+
+    @NotBlank(message = "La contraseña es obligatoria")
+    private String password;
+}
