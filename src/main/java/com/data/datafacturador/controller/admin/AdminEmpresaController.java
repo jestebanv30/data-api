@@ -58,9 +58,10 @@ public class AdminEmpresaController {
 
     /**
      * Crear una nueva empresa (y su sucursal principal)
+     * Soporta EmpresaCompletaRequest para definir detalles de sucursal
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<EmpresaResponse>> crearEmpresa(@RequestBody EmpresaRequest request) {
+    public ResponseEntity<ApiResponse<EmpresaResponse>> crearEmpresa(@RequestBody com.data.datafacturador.dto.EmpresaCompletaRequest request) {
         log.info("Creando empresa (Admin): {}", request.getRazonSocial());
         return ResponseEntity.ok(ApiResponse.success(
                 empresaService.crearEmpresa(request),
@@ -68,6 +69,19 @@ public class AdminEmpresaController {
         ));
     }
 
+    /**
+     * Actualizar datos de una empresa (Super Admin)
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<EmpresaResponse>> actualizarEmpresa(
+            @PathVariable Long id,
+            @RequestBody EmpresaRequest request) {
+        log.info("Actualizando empresa (Admin): {}", id);
+        return ResponseEntity.ok(ApiResponse.success(
+                empresaService.actualizarEmpresa(id, request),
+                "Empresa actualizada exitosamente"
+        ));
+    }
 
     /**
      * Listar sucursales de una empresa

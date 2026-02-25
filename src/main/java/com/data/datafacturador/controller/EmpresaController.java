@@ -5,6 +5,7 @@ import com.data.datafacturador.service.EmpresaService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -13,11 +14,13 @@ import java.util.Map;
 /**
  * Controlador de empresa
  * Endpoints: /api/empresas/*
+ * Solo acceso para roles ADMIN de la empresa
  */
 @Slf4j
 @RestController
 @RequestMapping("/api/empresas")
 @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
 public class EmpresaController {
 
     private final EmpresaService empresaService;

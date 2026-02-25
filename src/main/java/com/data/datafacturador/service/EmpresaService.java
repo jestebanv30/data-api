@@ -157,6 +157,41 @@ public class EmpresaService {
     }
 
     /**
+     * Actualiza los datos de una empresa por ID
+     * Para uso de Super Admin (puede editar cualquier empresa)
+     */
+    @Transactional
+    public EmpresaResponse actualizarEmpresa(Long id, com.data.datafacturador.dto.EmpresaRequest request) {
+        log.info("Actualizando empresa ID: {}", id);
+        Empresa empresa = empresaRepository.findById(id)
+                .orElseThrow(() -> new EmpresaNoEncontradaException(id));
+
+        if (request.getNombre() != null)         empresa.setNombre(request.getNombre());
+        if (request.getRazonSocial() != null)    empresa.setRazonSocial(request.getRazonSocial());
+        if (request.getNit() != null)            empresa.setNit(request.getNit());
+        if (request.getDv() != null)             empresa.setDv(request.getDv());
+        if (request.getDireccion() != null)      empresa.setDireccion(request.getDireccion());
+        if (request.getCiudad() != null)         empresa.setCiudad(request.getCiudad());
+        if (request.getDepartamento() != null)   empresa.setDepartamento(request.getDepartamento());
+        if (request.getPais() != null)           empresa.setPais(request.getPais());
+        if (request.getTelefono() != null)       empresa.setTelefono(request.getTelefono());
+        if (request.getCelular() != null)        empresa.setCelular(request.getCelular());
+        if (request.getEmail() != null)          empresa.setEmail(request.getEmail());
+        if (request.getSitioWeb() != null)       empresa.setSitioWeb(request.getSitioWeb());
+        if (request.getLogoUrl() != null)        empresa.setLogoUrl(request.getLogoUrl());
+        if (request.getConfiguracion() != null)  empresa.setConfiguracion(request.getConfiguracion());
+
+        empresa.setFechaActualizacion(java.time.LocalDateTime.now());
+        empresa = empresaRepository.save(empresa);
+        log.info("Empresa {} actualizada exitosamente", id);
+        return empresaMapper.toResponse(empresa);
+    }
+
+    /**
+     * Crea una nueva empresa y su sucursal principal
+     * Para uso de Super Admin
+     */
+    /**
      * Crea una nueva empresa y su sucursal principal
      * Para uso de Super Admin
      */
@@ -174,6 +209,7 @@ public class EmpresaService {
         empresa.setNombre(request.getNombre());
         empresa.setRazonSocial(request.getRazonSocial());
         empresa.setNit(request.getNit());
+        empresa.setDv(request.getDv());
         empresa.setDireccion(request.getDireccion());
         empresa.setCiudad(request.getCiudad());
         empresa.setDepartamento(request.getDepartamento());
@@ -193,58 +229,115 @@ public class EmpresaService {
         log.info("Empresa guardada con ID: {}", empresa.getId());
 
         // 2. Crear Sucursal Principal
-        crearSucursalPrincipal(empresa);
+        // Si el request es del tipo completo y trae detalle, lo usamos
+        com.data.datafacturador.sucursal.dto.SucursalRequest detalleSucursal = null;
+        
+        log.info("Clase del Request recibido: {}", request.getClass().getName());
+        
+        if (request instanceof com.data.datafacturador.dto.EmpresaCompletaRequest) {
+            detalleSucursal = ((com.data.datafacturador.dto.EmpresaCompletaRequest) request).getDetalleSucursalPrincipal();
+            log.info("Detalle Sucursal Principal recibido: {}", detalleSucursal);
+        } else {
+            log.info("Request NO es instancia de EmpresaCompletaRequest");
+        }
+        
+        crearSucursalPrincipal(empresa, detalleSucursal);
 
         return empresaMapper.toResponse(empresa);
     }
 
-    private void crearSucursalPrincipal(Empresa empresa) {
+    private void crearSucursalPrincipal(Empresa empresa, com.data.datafacturador.sucursal.dto.SucursalRequest detalle) {
         com.data.datafacturador.sucursal.entity.Sucursal sucursal = new com.data.datafacturador.sucursal.entity.Sucursal();
         
         // Vincular a la empresa
         sucursal.setEmpresaId(empresa.getId().intValue());
         
-        // Datos básicos (heredados de empresa)
-        sucursal.setNombreComercial(empresa.getNombre()); // Nombre comercial igual al de la empresa
-        sucursal.setNombreRazonSocial("SEDE PRINCIPAL"); // Nombre interno para distinguir
-        
-        // Datos legales heredados
-        sucursal.setCcNit(empresa.getNit());
-        // sucursal.setDv(...) // Calcular DV si es necesario, o dejar null por ahora
-        
-        // Ubicación heredada
-        sucursal.setDireccion(empresa.getDireccion() != null ? empresa.getDireccion() : "Dirección no registrada");
-        // Nota: Ciudad y Departamento en Empresa son Strings. En Sucursal son: idCiudad (String para ID) y Departamento (String).
-        // Como no tenemos el ID de ciudad mapeado desde el nombre en Empresa (que es texto libre posiblemente), 
-        // dejamos ciudad null o intentamos asignar si coincide. 
-        // Para evitar errores, dejaremos campos de ubicación específicos vacíos o solo texto si el campo lo permite.
-        // Sucursal tiene: direccion (String), departamento (String), ciudad (String nombre), idCiudad (String ID).
-        sucursal.setDepartamento(empresa.getDepartamento());
-        sucursal.setPais(empresa.getPais());
-        
-        // Contacto heredado (con defaults por si la empresa no los tiene, ya que son NOT NULL en Sucursal)
-        sucursal.setTelefono(empresa.getTelefono() != null ? empresa.getTelefono() : "No registrado");
-        sucursal.setCelular(empresa.getCelular() != null ? empresa.getCelular() : "No registrado");
-        sucursal.setCorreo(empresa.getEmail() != null ? empresa.getEmail() : "sin_correo@sistema.com");
-        
-        // Slogan (null o heredado si existiera)
-        sucursal.setSlogan("Gracias por su compra"); 
-        
-        // Configuración de impresión por defecto
-        sucursal.setCopiasVentas(1L);
-        sucursal.setCopiasCompras(1L);
-        sucursal.setCopiasCobros(1L);
-        sucursal.setCopiasPagos(1L);
-        sucursal.setSincronizarDian(0L); // No sincronizar por defecto
-        
-        // Logo vacio por defecto (mejor que null para evitar NPEs en frontend)
-        sucursal.setLogo(new byte[0]);
+        if (detalle != null) {
+            // --- Usar datos proporcionados en el detalle ---
+            sucursal.setNombreComercial(detalle.getNombreComercial() != null ? detalle.getNombreComercial() : empresa.getNombre());
+            sucursal.setNombreRazonSocial(detalle.getNombreRazonSocial() != null ? detalle.getNombreRazonSocial() : "SEDE PRINCIPAL");
+            
+            sucursal.setCcNit(detalle.getCcNit() != null ? detalle.getCcNit() : empresa.getNit());
+            sucursal.setDv(detalle.getDv()); // Puede ser null
+            
+            // Ubicación explícita
+            sucursal.setDireccion(detalle.getDireccion() != null ? detalle.getDireccion() : empresa.getDireccion());
+            sucursal.setPais(detalle.getPais() != null ? detalle.getPais() : empresa.getPais());
+            sucursal.setDepartamento(detalle.getDepartamento() != null ? detalle.getDepartamento() : empresa.getDepartamento());
+            sucursal.setIdCiudad(detalle.getCiudad()); // En Request es el ID
+            sucursal.setCiudad(detalle.getCiudad()); // Usamos el ID como nombre si no hay otro mecanismo, o idealmente buscar nombre
+            // Nota: Aquí se asume que si el FE manda el nombre ciudad en el campo ciudad, está bien.
+            
+            // Contacto explícito
+            sucursal.setTelefono(detalle.getTelefono() != null ? detalle.getTelefono() : empresa.getTelefono());
+            sucursal.setCelular(detalle.getCelular() != null ? detalle.getCelular() : empresa.getCelular());
+            sucursal.setCorreo(detalle.getCorreo() != null ? detalle.getCorreo() : empresa.getEmail());
+            
+            // Configuración visual
+            sucursal.setSlogan(detalle.getSlogan());
+            sucursal.setSloganOrden(detalle.getSloganOrden());
+            
+            // Configuración Operativa (si viene)
+            sucursal.setIdTipoOrganizacion(detalle.getIdTipoOrganizacion());
+            sucursal.setIdTipoIdentificacion(detalle.getIdTipoIdentificacion());
+            sucursal.setIdResponsabilidadFiscal(detalle.getIdResponsabilidadFiscal());
+            sucursal.setIdTipoRegimen(detalle.getIdTipoRegimen());
+            sucursal.setIdTipoResponsabilidadTributaria(detalle.getIdTipoResponsabilidadTributaria());
+            
+            sucursal.setCopiasVentas(detalle.getCopiasVentas() != null ? detalle.getCopiasVentas() : 1L);
+            sucursal.setCopiasCompras(detalle.getCopiasCompras() != null ? detalle.getCopiasCompras() : 1L);
+            sucursal.setCopiasCobros(detalle.getCopiasCobros() != null ? detalle.getCopiasCobros() : 1L);
+            sucursal.setCopiasPagos(detalle.getCopiasPagos() != null ? detalle.getCopiasPagos() : 1L);
 
-        // Configuración por defecto
+            sucursal.setSincronizarDian(detalle.getSincronizarDian() != null ? detalle.getSincronizarDian() : 0L);
+            sucursal.setImprimirQr(detalle.getImprimirQr());
+            sucursal.setBuscador(detalle.getBuscador());
+            
+            // Logo específico si viene
+            if (detalle.getLogoBase64() != null && !detalle.getLogoBase64().isEmpty()) {
+                try {
+                    sucursal.setLogo(java.util.Base64.getDecoder().decode(detalle.getLogoBase64()));
+                } catch (IllegalArgumentException e) {
+                    log.warn("Error decodificando logo Base64 para sucursal", e);
+                    sucursal.setLogo(new byte[0]);
+                }
+            } else {
+                 sucursal.setLogo(new byte[0]);
+            }
+
+            // IDs Referencias adicionales
+            sucursal.setIdDocumento(detalle.getIdDocumento());
+            sucursal.setIdTerceroDefecto(detalle.getIdTerceroDefecto());
+            sucursal.setIdListaPrecioDefecto(detalle.getIdListaPrecioDefecto());
+
+
+        } else {
+            // --- Lógica Legacy (Heredar de Empresa) ---
+            sucursal.setNombreComercial(empresa.getNombre());
+            sucursal.setNombreRazonSocial("SEDE PRINCIPAL");
+            
+            sucursal.setCcNit(empresa.getNit());
+            
+            sucursal.setDireccion(empresa.getDireccion() != null ? empresa.getDireccion() : "Dirección no registrada");
+            sucursal.setDepartamento(empresa.getDepartamento());
+            sucursal.setPais(empresa.getPais());
+            
+            sucursal.setTelefono(empresa.getTelefono() != null ? empresa.getTelefono() : "No registrado");
+            sucursal.setCelular(empresa.getCelular() != null ? empresa.getCelular() : "No registrado");
+            sucursal.setCorreo(empresa.getEmail() != null ? empresa.getEmail() : "sin_correo@sistema.com");
+            
+            sucursal.setSlogan("Gracias por su compra");
+            
+            sucursal.setCopiasPagos(1L);
+            
+            sucursal.setSincronizarDian(0L);
+            sucursal.setLogo(new byte[0]);
+        }
+        
+        // Configuración Común / Defaults finales
         sucursal.setEstado("ACTIVO");
         sucursal.setFechaActualizacion(java.time.ZonedDateTime.now());
         
-        // Guardar
         sucursalRepository.save(sucursal);
         log.info("Sucursal principal creada para empresa ID: {}", empresa.getId());
     }

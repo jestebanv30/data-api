@@ -63,15 +63,15 @@ public class SucursalMapper {
                 .nombreComercial(sucursal.getNombreComercial())
                 .ccNit(sucursal.getCcNit())
                 .dv(sucursal.getDv())
-                .tipoOrganizacion(toReferenciaDTO(sucursal.getTipoOrganizacion()))
-                .tipoIdentificacion(toReferenciaDTO(sucursal.getTipoIdentificacion()))
-                .responsabilidadFiscal(toReferenciaDTO(sucursal.getResponsabilidadFiscal()))
-                .tipoRegimen(toReferenciaDTO(sucursal.getTipoRegimen()))
-                .responsabilidadTributaria(toReferenciaDTO(sucursal.getResponsabilidadTributaria()))
+                .tipoOrganizacion(toReferenciaDTO(sucursal.getTipoOrganizacion(), sucursal.getIdTipoOrganizacion()))
+                .tipoIdentificacion(toReferenciaDTO(sucursal.getTipoIdentificacion(), sucursal.getIdTipoIdentificacion()))
+                .responsabilidadFiscal(toReferenciaDTO(sucursal.getResponsabilidadFiscal(), sucursal.getIdResponsabilidadFiscal()))
+                .tipoRegimen(toReferenciaDTO(sucursal.getTipoRegimen(), sucursal.getIdTipoRegimen()))
+                .responsabilidadTributaria(toReferenciaDTO(sucursal.getResponsabilidadTributaria(), sucursal.getIdTipoResponsabilidadTributaria()))
                 
                 // Ubicación (mapeada a objetos)
                 .pais(mapPais(sucursal.getPais()))
-                .ciudad(mapCiudad(sucursal.getIdCiudad()))
+                .ciudad(mapCiudad(sucursal.getIdCiudad(), sucursal.getCiudad())) // Pass stored name also if available
                 .direccion(sucursal.getDireccion())
                 .departamento(sucursal.getDepartamento())
                 
@@ -88,10 +88,9 @@ public class SucursalMapper {
                 .estado(sucursal.getEstado())
                 .activa(sucursal.isActiva())
                 .sincronizarDian(sucursal.getSincronizarDian())
-                .sincronizarDian(sucursal.getSincronizarDian())
-                .tipoDocumento(toReferenciaDTO(sucursal.getTipoDocumento()))
+                .tipoDocumento(toReferenciaDTO(sucursal.getTipoDocumento(), sucursal.getIdDocumento()))
                 .terceroDefecto(toTerceroDTO(sucursal.getTerceroDefecto()))
-                .tipoListaPrecioDefecto(toReferenciaDTO(sucursal.getTipoLista()))
+                .tipoListaPrecioDefecto(toReferenciaDTO(sucursal.getTipoLista(), sucursal.getIdListaPrecioDefecto()))
                 .imprimirQr(sucursal.getImprimirQr())
                 .buscador(sucursal.getBuscador())
                 .plan(sucursal.getPlan())
@@ -105,72 +104,46 @@ public class SucursalMapper {
     /**
      * Convierte una entidad de referencia a ReferenciaDTO
      */
-    private ReferenciaDTO toReferenciaDTO(TipoOrganizacion entity) {
-        if (entity == null)
-            return null;
-        return ReferenciaDTO.builder()
-                .id(entity.getId())
-                .nombre(entity.getNombre())
-                .codigo(entity.getCodigo())
-                .build();
+    private ReferenciaDTO toReferenciaDTO(TipoOrganizacion entity, Long id) {
+        if (entity != null) return new ReferenciaDTO(entity.getId(), entity.getNombre(), entity.getCodigo());
+        if (id != null) return new ReferenciaDTO(id, null, null);
+        return null;
     }
 
-    private ReferenciaDTO toReferenciaDTO(TipoIdentificacion entity) {
-        if (entity == null)
-            return null;
-        return ReferenciaDTO.builder()
-                .id(entity.getId())
-                .nombre(entity.getNombre())
-                .codigo(entity.getCodigo())
-                .build();
+    private ReferenciaDTO toReferenciaDTO(TipoIdentificacion entity, Long id) {
+        if (entity != null) return new ReferenciaDTO(entity.getId(), entity.getNombre(), entity.getCodigo());
+        if (id != null) return new ReferenciaDTO(id, null, null);
+        return null;
     }
 
-    private ReferenciaDTO toReferenciaDTO(ResponsabilidadFiscal entity) {
-        if (entity == null)
-            return null;
-        return ReferenciaDTO.builder()
-                .id(entity.getId())
-                .nombre(entity.getNombre())
-                .codigo(entity.getCodigo())
-                .build();
+    private ReferenciaDTO toReferenciaDTO(ResponsabilidadFiscal entity, Long id) {
+        if (entity != null) return new ReferenciaDTO(entity.getId(), entity.getNombre(), entity.getCodigo());
+        if (id != null) return new ReferenciaDTO(id, null, null);
+        return null;
     }
 
-    private ReferenciaDTO toReferenciaDTO(TipoRegimen entity) {
-        if (entity == null)
-            return null;
-        return ReferenciaDTO.builder()
-                .id(entity.getId())
-                .nombre(entity.getNombre())
-                .codigo(entity.getCodigo())
-                .build();
+    private ReferenciaDTO toReferenciaDTO(TipoRegimen entity, Long id) {
+        if (entity != null) return new ReferenciaDTO(entity.getId(), entity.getNombre(), entity.getCodigo());
+        if (id != null) return new ReferenciaDTO(id, null, null);
+        return null;
     }
 
-    private ReferenciaDTO toReferenciaDTO(TipoDocumento entity) {
-        if (entity == null) return null;
-        return ReferenciaDTO.builder()
-                .id(entity.getId())
-                .nombre(entity.getNombre())
-                .codigo(entity.getCodigo())
-                .build();
+    private ReferenciaDTO toReferenciaDTO(TipoDocumento entity, Long id) {
+        if (entity != null) return new ReferenciaDTO(entity.getId(), entity.getNombre(), entity.getCodigo());
+        if (id != null) return new ReferenciaDTO(id, null, null);
+        return null;
     }
 
-    private ReferenciaDTO toReferenciaDTO(TipoLista entity) {
-        if (entity == null) return null;
-        return ReferenciaDTO.builder()
-                .id(entity.getId())
-                .nombre(entity.getNombre())
-                .codigo(null) // TipoLista no tiene código
-                .build();
+    private ReferenciaDTO toReferenciaDTO(TipoLista entity, Long id) {
+        if (entity != null) return new ReferenciaDTO(entity.getId(), entity.getNombre(), null);
+        if (id != null) return new ReferenciaDTO(id, null, null);
+        return null;
     }
 
-    private ReferenciaDTO toReferenciaDTO(ResponsabilidadTributaria entity) {
-        if (entity == null)
-            return null;
-        return ReferenciaDTO.builder()
-                .id(entity.getId())
-                .nombre(entity.getNombre())
-                .codigo(entity.getCodigo())
-                .build();
+    private ReferenciaDTO toReferenciaDTO(ResponsabilidadTributaria entity, Long id) {
+        if (entity != null) return new ReferenciaDTO(entity.getId(), entity.getNombre(), entity.getCodigo());
+        if (id != null) return new ReferenciaDTO(id, null, null);
+        return null;
     }
     
     private com.data.datafacturador.sucursal.dto.TerceroSimpleDTO toTerceroDTO(com.data.datafacturador.entity.Tercero entity) {
@@ -189,15 +162,15 @@ public class SucursalMapper {
                 .orElse(new ReferenciaDTO(null, nombrePais, null)); // Fallback si no encuentra
     }
 
-    private ReferenciaDTO mapCiudad(String idCiudadStr) {
+    private ReferenciaDTO mapCiudad(String idCiudadStr, String nombreCiudadFallback) {
         if (idCiudadStr == null) return null;
         try {
             Long id = Long.parseLong(idCiudadStr);
             return ciudadDepartamentoRepository.findById(id)
                     .map(c -> new ReferenciaDTO(c.getId(), c.getNombre(), c.getIdDepartamento()))
-                    .orElse(null);
+                    .orElse(new ReferenciaDTO(id, nombreCiudadFallback != null ? nombreCiudadFallback : "ID: " + id, null));
         } catch (NumberFormatException e) {
-            return null; // Si el ID no es numérico (legacy data corrompida)
+            return new ReferenciaDTO(null, idCiudadStr, null); 
         }
     }
 }

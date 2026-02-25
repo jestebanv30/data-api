@@ -33,6 +33,9 @@ public class Empresa {
     @Column(nullable = false, unique = true, length = 50)
     private String nit;
 
+    @Column(length = 10)
+    private String dv; // Dígito de verificación
+
     @Column(columnDefinition = "TEXT")
     private String direccion;
 

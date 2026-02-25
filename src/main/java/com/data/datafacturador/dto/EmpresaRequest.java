@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Data
-@Builder
+@lombok.experimental.SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmpresaRequest {
@@ -22,6 +22,8 @@ public class EmpresaRequest {
 
     @NotBlank(message = "El NIT es obligatorio")
     private String nit;
+
+    private String dv; // Dígito de verificación (opcional)
 
     private String direccion;
     private String ciudad;

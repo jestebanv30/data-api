@@ -23,6 +23,7 @@ public class EmpresaMapper {
                 .nombre(empresa.getNombre())
                 .razonSocial(empresa.getRazonSocial())
                 .nit(empresa.getNit())
+                .dv(empresa.getDv())
                 .direccion(empresa.getDireccion())
                 .ciudad(empresa.getCiudad())
                 .departamento(empresa.getDepartamento())

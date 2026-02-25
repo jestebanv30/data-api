@@ -21,6 +21,7 @@ public class EmpresaResponse {
     private String nombre; // Nombre comercial
     private String razonSocial; // Razón social
     private String nit; // NIT o documento de identificación
+    private String dv;  // Dígito de verificación
     private String direccion;
     private String ciudad;
     private String departamento;

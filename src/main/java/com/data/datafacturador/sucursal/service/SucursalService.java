@@ -208,6 +208,26 @@ public class SucursalService {
         return sucursalMapper.toDetailResponse(actualizada);
     }
 
+    /**
+     * Actualiza una sucursal por ID (Super Admin)
+     * Sin restricción de empresa — puede editar cualquier sucursal
+     */
+    @Transactional
+    public SucursalDetailResponse actualizarSucursalAdmin(Long sucursalId, com.data.datafacturador.sucursal.dto.SucursalRequest request) {
+        log.info("Actualizando sucursal (Admin) ID: {}", sucursalId);
+
+        Sucursal sucursal = sucursalRepository.findById(sucursalId)
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada: " + sucursalId));
+
+        mapearDatosSucursal(sucursal, request);
+        sucursal.setFechaActualizacion(java.time.ZonedDateTime.now());
+
+        Sucursal actualizada = sucursalRepository.save(sucursal);
+        log.info("Sucursal {} actualizada exitosamente (Admin)", sucursalId);
+
+        return sucursalMapper.toDetailResponse(actualizada);
+    }
+
     private void mapearDatosSucursal(Sucursal sucursal, com.data.datafacturador.sucursal.dto.SucursalRequest request) {
         if (request.getNombreComercial() != null) sucursal.setNombreComercial(request.getNombreComercial());
         if (request.getNombreRazonSocial() != null) sucursal.setNombreRazonSocial(request.getNombreRazonSocial());
