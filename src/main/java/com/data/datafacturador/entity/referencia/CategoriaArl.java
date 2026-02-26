@@ -13,4 +13,7 @@ public class CategoriaArl {
 
     @Column(name = "categoria_arl")
     private String nombre;
+
+    @Column(name = "empresa_id")
+    private Integer empresaId;
 }

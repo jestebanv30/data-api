@@ -90,8 +90,9 @@ public class Empleado {
     @Column(name = "numero_contrato")
     private String numeroContrato;
 
-    @Column(name = "centro_costo")
-    private String centroCosto;
+    @ManyToOne
+    @JoinColumn(name = "centro_costo")
+    private com.data.datafacturador.entity.referencia.CentroCosto centroCosto;
 
     // References via Code
     @ManyToOne
@@ -110,15 +111,17 @@ public class Empleado {
     @JoinColumn(name = "id_fondo_salud")
     private FondoSalud fondoSalud;
 
-    @Column(name = "porcentaje_salud")
-    private String porcentajeSalud;
+    @ManyToOne
+    @JoinColumn(name = "porcentaje_salud")
+    private com.data.datafacturador.entity.referencia.PorcentajeSalud porcentajeSalud;
 
     @ManyToOne
     @JoinColumn(name = "id_fondo_pension")
     private FondoPension fondoPension;
 
-    @Column(name = "porcentaje_pension")
-    private String porcentajePension;
+    @ManyToOne
+    @JoinColumn(name = "porcentaje_pension")
+    private com.data.datafacturador.entity.referencia.PorcentajePension porcentajePension;
 
     @ManyToOne
     @JoinColumn(name = "id_arl")

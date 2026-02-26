@@ -13,4 +13,7 @@ public class SubtipoCotizante {
 
     @Column(name = "subtipo_cotizante")
     private String nombre;
+
+    @Column(name = "empresa_id")
+    private Integer empresaId;
 }

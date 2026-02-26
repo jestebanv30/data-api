@@ -16,4 +16,7 @@ public class TipoTrabajador {
 
     @Column(name = "tipo_trabajador")
     private String nombre;
+
+    @Column(name = "empresa_id")
+    private Integer empresaId;
 }

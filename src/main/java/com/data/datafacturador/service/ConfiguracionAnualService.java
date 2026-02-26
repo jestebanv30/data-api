@@ -34,13 +34,12 @@ public class ConfiguracionAnualService {
 
     @Transactional
     public SalarioMinimo guardarSalarioMinimo(SalarioMinimo salario, Integer empresaId, boolean esSuperAdmin) {
-        // Validación de unicidad si es necesario, pero por ahora simple
         if (!esSuperAdmin) {
             if (empresaId == null) throw new SecurityException("Usuario normal no puede crear globales");
             salario.setEmpresaId(empresaId);
-        } else {
-             // Si es Super Admin, respetamos el empresaId que venga (null o valor)
         }
+        // Auto-cálculo: Tope = 2 × Salario Mínimo
+        calcularTope(salario);
         return salarioMinimoRepository.save(salario);
     }
     
@@ -55,10 +54,23 @@ public class ConfiguracionAnualService {
         
         existente.setSalarioMinimo(actualizado.getSalarioMinimo());
         existente.setAuxilioTransporte(actualizado.getAuxilioTransporte());
-        existente.setTopeSalarioAuxilio(actualizado.getTopeSalarioAuxilio());
-        // anio no se suele cambiar al editar, pero se podria
+        // Auto-cálculo: Tope = 2 × Salario Mínimo
+        calcularTope(existente);
+        // anio no se suele cambiar al editar
         
         return salarioMinimoRepository.save(existente);
+    }
+
+    /**
+     * Calcula automáticamente el tope de salario para auxilio de transporte.
+     * Tope = 2 × Salario Mínimo (2 SMMLV)
+     */
+    private void calcularTope(SalarioMinimo salario) {
+        if (salario.getSalarioMinimo() != null) {
+            salario.setTopeSalarioAuxilio(
+                salario.getSalarioMinimo().multiply(java.math.BigDecimal.valueOf(2))
+            );
+        }
     }
 
     @Transactional

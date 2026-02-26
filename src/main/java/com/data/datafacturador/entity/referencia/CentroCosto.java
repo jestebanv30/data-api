@@ -5,18 +5,18 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "tipo_contrato", schema = "data2")
-public class TipoContrato {
+@Table(name = "centro_costo", schema = "data2")
+public class CentroCosto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "codigo_dian")
-    private String codigo;
-
-    @Column(name = "tipo_contrato")
+    @Column(name = "centro_costo")
     private String nombre;
 
+    @Column(name = "usuario")
+    private String usuario;
+
     @Column(name = "empresa_id")
-    private Integer empresaId; // NULL = Global, valor = Local
+    private Integer empresaId;
 }

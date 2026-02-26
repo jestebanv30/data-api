@@ -36,7 +36,7 @@ public class ReferenciaController {
     private final ConceptoRetiroRepository conceptoRetiroRepository;
     private final TipoIdentificacionRepository tipoIdentificacionRepository;
     
-    // Legacy / Sucursal References (Restored)
+    // Legacy / Sucursal References
     private final TipoRegimenRepository tipoRegimenRepository;
     private final ResponsabilidadTributariaRepository responsabilidadTributariaRepository;
     private final TipoOrganizacionRepository tipoOrganizacionRepository;
@@ -51,68 +51,101 @@ public class ReferenciaController {
     private final BancoRepository bancoRepository;
     private final FormaPagoRepository formaPagoRepository;
     private final MedioPagoRepository medioPagoRepository;
+    private final CentroCostoRepository centroCostoRepository;
+    private final PorcentajeSaludRepository porcentajeSaludRepository;
+    private final PorcentajePensionRepository porcentajePensionRepository;
     
     private final UsuarioService usuarioService;
 
-    // Global References
-    @GetMapping("/tipos-identificacion")
-    public ResponseEntity<ApiResponse<List<TipoIdentificacion>>> listarTiposIdentificacion() {
-        return ResponseEntity.ok(ApiResponse.success(tipoIdentificacionRepository.findAll(), "Tipos de identificación listados"));
-    }
+    // ====================================================================
+    // REFERENCIAS HÍBRIDAS (Global + Local de la empresa del usuario)
+    // ====================================================================
 
     @GetMapping("/tipos-contrato")
-    public ResponseEntity<ApiResponse<List<TipoContrato>>> listarTiposContrato() {
-        return ResponseEntity.ok(ApiResponse.success(tipoContratoRepository.findAll(), "Tipos de contrato listados"));
+    public ResponseEntity<ApiResponse<List<TipoContrato>>> listarTiposContrato(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(tipoContratoRepository.findAllByEmpresaIdOrGlobal(empresaId), "Tipos de contrato listados"));
     }
 
     @GetMapping("/tipos-periodo")
-    public ResponseEntity<ApiResponse<List<TipoPeriodo>>> listarTiposPeriodo() {
-        return ResponseEntity.ok(ApiResponse.success(tipoPeriodoRepository.findAll(), "Tipos de periodo listados"));
+    public ResponseEntity<ApiResponse<List<TipoPeriodo>>> listarTiposPeriodo(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(tipoPeriodoRepository.findAllByEmpresaIdOrGlobal(empresaId), "Tipos de periodo listados"));
     }
 
     @GetMapping("/cargos")
-    public ResponseEntity<ApiResponse<List<TipoCargo>>> listarCargos() {
-        return ResponseEntity.ok(ApiResponse.success(tipoCargoRepository.findAll(), "Cargos listados"));
+    public ResponseEntity<ApiResponse<List<TipoCargo>>> listarCargos(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(tipoCargoRepository.findAllByEmpresaIdOrGlobal(empresaId), "Cargos listados"));
     }
 
     @GetMapping("/tipos-trabajador")
-    public ResponseEntity<ApiResponse<List<TipoTrabajador>>> listarTiposTrabajador() {
-        return ResponseEntity.ok(ApiResponse.success(tipoTrabajadorRepository.findAll(), "Tipos de trabajador listados"));
+    public ResponseEntity<ApiResponse<List<TipoTrabajador>>> listarTiposTrabajador(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(tipoTrabajadorRepository.findAllByEmpresaIdOrGlobal(empresaId), "Tipos de trabajador listados"));
     }
 
     @GetMapping("/subtipos-cotizante")
-    public ResponseEntity<ApiResponse<List<SubtipoCotizante>>> listarSubtiposCotizante() {
-        return ResponseEntity.ok(ApiResponse.success(subtipoCotizanteRepository.findAll(), "Subtipos cotizante listados"));
+    public ResponseEntity<ApiResponse<List<SubtipoCotizante>>> listarSubtiposCotizante(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(subtipoCotizanteRepository.findAllByEmpresaIdOrGlobal(empresaId), "Subtipos cotizante listados"));
     }
 
     @GetMapping("/fondos-salud")
-    public ResponseEntity<ApiResponse<List<FondoSalud>>> listarFondosSalud() {
-        return ResponseEntity.ok(ApiResponse.success(fondoSaludRepository.findAll(), "Fondos de salud listados"));
+    public ResponseEntity<ApiResponse<List<FondoSalud>>> listarFondosSalud(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(fondoSaludRepository.findAllByEmpresaIdOrGlobal(empresaId), "Fondos de salud listados"));
     }
 
     @GetMapping("/fondos-pension")
-    public ResponseEntity<ApiResponse<List<FondoPension>>> listarFondosPension() {
-        return ResponseEntity.ok(ApiResponse.success(fondoPensionRepository.findAll(), "Fondos de pensión listados"));
+    public ResponseEntity<ApiResponse<List<FondoPension>>> listarFondosPension(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(fondoPensionRepository.findAllByEmpresaIdOrGlobal(empresaId), "Fondos de pensión listados"));
     }
 
     @GetMapping("/fondos-cesantias")
-    public ResponseEntity<ApiResponse<List<FondoCesantias>>> listarFondosCesantias() {
-        return ResponseEntity.ok(ApiResponse.success(fondoCesantiasRepository.findAll(), "Fondos de cesantías listados"));
+    public ResponseEntity<ApiResponse<List<FondoCesantias>>> listarFondosCesantias(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(fondoCesantiasRepository.findAllByEmpresaIdOrGlobal(empresaId), "Fondos de cesantías listados"));
     }
 
     @GetMapping("/arl")
-    public ResponseEntity<ApiResponse<List<Arl>>> listarArl() {
-        return ResponseEntity.ok(ApiResponse.success(arlRepository.findAll(), "ARLs listadas"));
+    public ResponseEntity<ApiResponse<List<Arl>>> listarArl(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(arlRepository.findAllByEmpresaIdOrGlobal(empresaId), "ARLs listadas"));
     }
 
     @GetMapping("/categorias-arl")
-    public ResponseEntity<ApiResponse<List<CategoriaArl>>> listarCategoriasArl() {
-        return ResponseEntity.ok(ApiResponse.success(categoriaArlRepository.findAll(), "Categorías ARL listadas"));
+    public ResponseEntity<ApiResponse<List<CategoriaArl>>> listarCategoriasArl(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(categoriaArlRepository.findAllByEmpresaIdOrGlobal(empresaId), "Categorías ARL listadas"));
+    }
+
+    @GetMapping("/porcentajes-salud")
+    public ResponseEntity<ApiResponse<List<PorcentajeSalud>>> listarPorcentajesSalud(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(porcentajeSaludRepository.findAllByEmpresaIdOrGlobal(empresaId), "Porcentajes salud listados"));
+    }
+
+    @GetMapping("/porcentajes-pension")
+    public ResponseEntity<ApiResponse<List<PorcentajePension>>> listarPorcentajesPension(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(porcentajePensionRepository.findAllByEmpresaIdOrGlobal(empresaId), "Porcentajes pensión listados"));
     }
 
     @GetMapping("/cajas-compensacion")
-    public ResponseEntity<ApiResponse<List<CajaCompensacion>>> listarCajasCompensacion() {
-        return ResponseEntity.ok(ApiResponse.success(cajaCompensacionRepository.findAll(), "Cajas de compensación listadas"));
+    public ResponseEntity<ApiResponse<List<CajaCompensacion>>> listarCajasCompensacion(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(cajaCompensacionRepository.findAllByEmpresaIdOrGlobal(empresaId), "Cajas de compensación listadas"));
+    }
+
+    // ====================================================================
+    // REFERENCIAS GLOBALES (No necesitan empresa_id)
+    // ====================================================================
+
+    @GetMapping("/tipos-identificacion")
+    public ResponseEntity<ApiResponse<List<TipoIdentificacion>>> listarTiposIdentificacion() {
+        return ResponseEntity.ok(ApiResponse.success(tipoIdentificacionRepository.findAll(), "Tipos de identificación listados"));
     }
 
     @GetMapping("/conceptos-retiro")
@@ -120,9 +153,7 @@ public class ReferenciaController {
         return ResponseEntity.ok(ApiResponse.success(conceptoRetiroRepository.findAll(), "Conceptos de retiro listados"));
     }
 
-
-
-    // --- Legacy / Sucursal Endpoints (Restored) ---
+    // --- Sucursal / Facturación References (Global) ---
 
     @GetMapping("/tipos-regimen")
     public ResponseEntity<ApiResponse<List<TipoRegimen>>> listarTiposRegimen() {
@@ -164,7 +195,10 @@ public class ReferenciaController {
         return ResponseEntity.ok(ApiResponse.success(ciudadDepartamentoRepository.findAll(), "Ciudades listadas"));
     }
 
-    // Company References (Filtered)
+    // ====================================================================
+    // REFERENCIAS POR EMPRESA (Filtered — ya tenían empresa_id)
+    // ====================================================================
+
     @GetMapping("/bancos")
     public ResponseEntity<ApiResponse<List<Banco>>> listarBancos(Authentication authentication) {
         Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
@@ -174,13 +208,19 @@ public class ReferenciaController {
     @GetMapping("/formas-pago")
     public ResponseEntity<ApiResponse<List<FormaPago>>> listarFormasPago(Authentication authentication) {
         Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
-        return ResponseEntity.ok(ApiResponse.success(formaPagoRepository.findByEmpresaId(empresaId), "Formas de pago listadas"));
+        return ResponseEntity.ok(ApiResponse.success(formaPagoRepository.findAllByEmpresaIdOrGlobal(empresaId), "Formas de pago listadas"));
     }
 
     @GetMapping("/medios-pago")
     public ResponseEntity<ApiResponse<List<MedioPago>>> listarMediosPago(Authentication authentication) {
         Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
         return ResponseEntity.ok(ApiResponse.success(medioPagoRepository.findByEmpresaId(empresaId), "Medios de pago listados"));
+    }
+
+    @GetMapping("/centros-costo")
+    public ResponseEntity<ApiResponse<List<CentroCosto>>> listarCentrosCosto(Authentication authentication) {
+        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
+        return ResponseEntity.ok(ApiResponse.success(centroCostoRepository.findByEmpresaId(empresaId), "Centros de costo listados"));
     }
 
     private Integer obtenerEmpresaIdUsuarioAutenticado(Authentication authentication) {

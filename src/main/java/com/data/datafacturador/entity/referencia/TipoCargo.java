@@ -13,4 +13,7 @@ public class TipoCargo {
 
     @Column(name = "tipo_cargo")
     private String nombre;
+
+    @Column(name = "empresa_id")
+    private Integer empresaId;
 }

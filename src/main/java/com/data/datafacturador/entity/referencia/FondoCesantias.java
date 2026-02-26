@@ -13,4 +13,7 @@ public class FondoCesantias {
 
     @Column(name = "fondo_cesantias")
     private String nombre;
+
+    @Column(name = "empresa_id")
+    private Integer empresaId;
 }

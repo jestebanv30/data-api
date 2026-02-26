@@ -40,6 +40,9 @@ public class EmpleadoService {
     private final com.data.datafacturador.repository.nomina.BancoRepository bancoRepository;
     private final com.data.datafacturador.repository.nomina.FormaPagoRepository formaPagoRepository;
     private final com.data.datafacturador.repository.nomina.MedioPagoRepository medioPagoRepository;
+    private final com.data.datafacturador.repository.referencia.CentroCostoRepository centroCostoRepository;
+    private final com.data.datafacturador.repository.referencia.PorcentajeSaludRepository porcentajeSaludRepository;
+    private final com.data.datafacturador.repository.referencia.PorcentajePensionRepository porcentajePensionRepository;
 
     // Referencias Usuario (para eliminación y sincronización)
     private final com.data.datafacturador.repository.UsuarioRepository usuarioRepository;
@@ -296,15 +299,27 @@ public class EmpleadoService {
             e.setMedioPago(medioPagoRepository.findById(e.getMedioPago().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Medio Pago no válido")));
         }
-
-        // --- Referencias por Código DIAN (String) ---
-        if (e.getTipoContrato() != null && e.getTipoContrato().getCodigo() != null) {
-            e.setTipoContrato(tipoContratoRepository.findByCodigo(e.getTipoContrato().getCodigo())
-                .orElseThrow(() -> new IllegalArgumentException("Tipo Contrato no válido: " + e.getTipoContrato().getCodigo())));
+        if (e.getCentroCosto() != null && e.getCentroCosto().getId() != null) {
+            e.setCentroCosto(centroCostoRepository.findById(e.getCentroCosto().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Centro de Costo no válido")));
         }
-        if (e.getTipoTrabajador() != null && e.getTipoTrabajador().getCodigo() != null) {
-            e.setTipoTrabajador(tipoTrabajadorRepository.findByCodigo(e.getTipoTrabajador().getCodigo())
-                .orElseThrow(() -> new IllegalArgumentException("Tipo Trabajador no válido: " + e.getTipoTrabajador().getCodigo())));
+        if (e.getPorcentajeSalud() != null && e.getPorcentajeSalud().getId() != null) {
+            e.setPorcentajeSalud(porcentajeSaludRepository.findById(e.getPorcentajeSalud().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Porcentaje Salud no válido")));
+        }
+        if (e.getPorcentajePension() != null && e.getPorcentajePension().getId() != null) {
+            e.setPorcentajePension(porcentajePensionRepository.findById(e.getPorcentajePension().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Porcentaje Pensión no válido")));
+        }
+
+        // --- Referencias por ID ---
+        if (e.getTipoContrato() != null && e.getTipoContrato().getId() != null) {
+            e.setTipoContrato(tipoContratoRepository.findById(e.getTipoContrato().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Tipo Contrato no válido (ID)")));
+        }
+        if (e.getTipoTrabajador() != null && e.getTipoTrabajador().getId() != null) {
+            e.setTipoTrabajador(tipoTrabajadorRepository.findById(e.getTipoTrabajador().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Tipo Trabajador no válido (ID)")));
         }
     }
 }

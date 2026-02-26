@@ -18,6 +18,8 @@ import java.util.List;
 public class AdminConfiguracionController {
 
     private final ConfiguracionAnualService configuracionAnualService;
+    private final com.data.datafacturador.repository.referencia.PorcentajeSaludRepository porcentajeSaludRepository;
+    private final com.data.datafacturador.repository.referencia.PorcentajePensionRepository porcentajePensionRepository;
 
     // --- Retenciones (Globales + Locales) ---
 
@@ -105,6 +107,69 @@ public class AdminConfiguracionController {
     @DeleteMapping("/impuestos/{id}")
     public ResponseEntity<Void> eliminarImpuesto(@PathVariable Long id) {
         configuracionAnualService.eliminarImpuesto(id, null, true);
+        return ResponseEntity.noContent().build();
+    }
+
+    // --- Porcentajes Salud (Globales) ---
+
+    @GetMapping("/porcentajes-salud")
+    public ResponseEntity<List<com.data.datafacturador.entity.referencia.PorcentajeSalud>> listarPorcentajesSalud() {
+        return ResponseEntity.ok(porcentajeSaludRepository.findAll());
+    }
+
+    @PostMapping("/porcentajes-salud")
+    public ResponseEntity<com.data.datafacturador.entity.referencia.PorcentajeSalud> crearPorcentajeSalud(
+            @RequestBody com.data.datafacturador.entity.referencia.PorcentajeSalud porcentaje) {
+        // Super Admin crea como global (empresa_id = null)
+        porcentaje.setEmpresaId(null);
+        return ResponseEntity.ok(porcentajeSaludRepository.save(porcentaje));
+    }
+
+    @PutMapping("/porcentajes-salud/{id}")
+    public ResponseEntity<com.data.datafacturador.entity.referencia.PorcentajeSalud> actualizarPorcentajeSalud(
+            @PathVariable Long id,
+            @RequestBody com.data.datafacturador.entity.referencia.PorcentajeSalud actualizado) {
+        com.data.datafacturador.entity.referencia.PorcentajeSalud existente = porcentajeSaludRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Porcentaje salud no encontrado"));
+        existente.setPorcentaje(actualizado.getPorcentaje());
+        existente.setDescripcion(actualizado.getDescripcion());
+        return ResponseEntity.ok(porcentajeSaludRepository.save(existente));
+    }
+
+    @DeleteMapping("/porcentajes-salud/{id}")
+    public ResponseEntity<Void> eliminarPorcentajeSalud(@PathVariable Long id) {
+        porcentajeSaludRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // --- Porcentajes Pensión (Globales) ---
+
+    @GetMapping("/porcentajes-pension")
+    public ResponseEntity<List<com.data.datafacturador.entity.referencia.PorcentajePension>> listarPorcentajesPension() {
+        return ResponseEntity.ok(porcentajePensionRepository.findAll());
+    }
+
+    @PostMapping("/porcentajes-pension")
+    public ResponseEntity<com.data.datafacturador.entity.referencia.PorcentajePension> crearPorcentajePension(
+            @RequestBody com.data.datafacturador.entity.referencia.PorcentajePension porcentaje) {
+        porcentaje.setEmpresaId(null);
+        return ResponseEntity.ok(porcentajePensionRepository.save(porcentaje));
+    }
+
+    @PutMapping("/porcentajes-pension/{id}")
+    public ResponseEntity<com.data.datafacturador.entity.referencia.PorcentajePension> actualizarPorcentajePension(
+            @PathVariable Long id,
+            @RequestBody com.data.datafacturador.entity.referencia.PorcentajePension actualizado) {
+        com.data.datafacturador.entity.referencia.PorcentajePension existente = porcentajePensionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Porcentaje pensión no encontrado"));
+        existente.setPorcentaje(actualizado.getPorcentaje());
+        existente.setDescripcion(actualizado.getDescripcion());
+        return ResponseEntity.ok(porcentajePensionRepository.save(existente));
+    }
+
+    @DeleteMapping("/porcentajes-pension/{id}")
+    public ResponseEntity<Void> eliminarPorcentajePension(@PathVariable Long id) {
+        porcentajePensionRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

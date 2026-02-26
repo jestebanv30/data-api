@@ -13,4 +13,7 @@ public class TipoPeriodo {
 
     @Column(name = "tipo_periodo")
     private String nombre;
+
+    @Column(name = "empresa_id")
+    private Integer empresaId;
 }

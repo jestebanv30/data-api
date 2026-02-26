@@ -13,4 +13,7 @@ public class FondoPension {
 
     @Column(name = "fondo_pension")
     private String nombre;
+
+    @Column(name = "empresa_id")
+    private Integer empresaId;
 }

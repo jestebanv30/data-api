@@ -13,4 +13,7 @@ public class FondoSalud {
 
     @Column(name = "fondo_salud")
     private String nombre;
+
+    @Column(name = "empresa_id")
+    private Integer empresaId;
 }
