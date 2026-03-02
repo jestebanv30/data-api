@@ -270,7 +270,6 @@ public class SucursalService {
         if (request.getIdTerceroDefecto() != null) sucursal.setIdTerceroDefecto(request.getIdTerceroDefecto());
         
         if (request.getImprimirQr() != null) sucursal.setImprimirQr(request.getImprimirQr());
-        if (request.getBuscador() != null) sucursal.setBuscador(request.getBuscador());
 
         // Logo
         if (request.getLogoBase64() != null && !request.getLogoBase64().isEmpty()) {

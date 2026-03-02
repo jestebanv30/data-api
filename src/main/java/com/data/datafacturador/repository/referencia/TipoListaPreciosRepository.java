@@ -8,4 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface TipoListaPreciosRepository extends JpaRepository<TipoListaPrecios, Long> {
+    java.util.List<TipoListaPrecios> findByIdSucursalOrderByNombreAsc(Long idSucursal);
 }

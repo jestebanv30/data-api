@@ -327,11 +327,156 @@ public class ReferenciaLocalController {
     }
 
     // ====================================================================
+    // PUTs - EDITAR REFERENCIAS LOCALES (solo registros de la empresa)
+    // ====================================================================
+
+    @PutMapping("/tipos-contrato/{id}")
+    public ResponseEntity<ApiResponse<TipoContrato>> editarTipoContrato(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        Integer empresaId = getEmpresaId(auth);
+        TipoContrato entity = verificarOwnership(tipoContratoRepository, id, empresaId, "Tipo de contrato");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        if (body.containsKey("codigo")) {
+            String nuevoCodigo = body.get("codigo");
+            // Solo validar unicidad si el código cambia
+            if (!nuevoCodigo.equals(entity.getCodigo()) && tipoContratoRepository.existsByCodigo(nuevoCodigo)) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("El código DIAN '" + nuevoCodigo + "' ya existe en el sistema"));
+            }
+            entity.setCodigo(nuevoCodigo);
+        }
+        return ok(tipoContratoRepository.save(entity), "Tipo de contrato actualizado");
+    }
+
+    @PutMapping("/cargos/{id}")
+    public ResponseEntity<ApiResponse<TipoCargo>> editarCargo(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        TipoCargo entity = verificarOwnership(tipoCargoRepository, id, getEmpresaId(auth), "Cargo");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(tipoCargoRepository.save(entity), "Cargo actualizado");
+    }
+
+    @PutMapping("/tipos-trabajador/{id}")
+    public ResponseEntity<ApiResponse<TipoTrabajador>> editarTipoTrabajador(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        Integer empresaId = getEmpresaId(auth);
+        TipoTrabajador entity = verificarOwnership(tipoTrabajadorRepository, id, empresaId, "Tipo de trabajador");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        if (body.containsKey("codigo")) {
+            String nuevoCodigo = body.get("codigo");
+            if (!nuevoCodigo.equals(entity.getCodigo()) && tipoTrabajadorRepository.existsByCodigo(nuevoCodigo)) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("El código DIAN '" + nuevoCodigo + "' ya existe en el sistema"));
+            }
+            entity.setCodigo(nuevoCodigo);
+        }
+        return ok(tipoTrabajadorRepository.save(entity), "Tipo de trabajador actualizado");
+    }
+
+    @PutMapping("/subtipos-cotizante/{id}")
+    public ResponseEntity<ApiResponse<SubtipoCotizante>> editarSubtipoCotizante(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        SubtipoCotizante entity = verificarOwnership(subtipoCotizanteRepository, id, getEmpresaId(auth), "Subtipo cotizante");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(subtipoCotizanteRepository.save(entity), "Subtipo cotizante actualizado");
+    }
+
+    @PutMapping("/bancos/{id}")
+    public ResponseEntity<ApiResponse<com.data.datafacturador.entity.nomina.Banco>> editarBanco(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        com.data.datafacturador.entity.nomina.Banco entity = verificarOwnership(bancoRepository, id, getEmpresaId(auth), "Banco");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(bancoRepository.save(entity), "Banco actualizado");
+    }
+
+    @PutMapping("/tipos-periodo/{id}")
+    public ResponseEntity<ApiResponse<TipoPeriodo>> editarTipoPeriodo(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        TipoPeriodo entity = verificarOwnership(tipoPeriodoRepository, id, getEmpresaId(auth), "Tipo de periodo");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(tipoPeriodoRepository.save(entity), "Tipo de periodo actualizado");
+    }
+
+    @PutMapping("/fondos-salud/{id}")
+    public ResponseEntity<ApiResponse<FondoSalud>> editarFondoSalud(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        FondoSalud entity = verificarOwnership(fondoSaludRepository, id, getEmpresaId(auth), "Fondo de salud");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(fondoSaludRepository.save(entity), "Fondo de salud actualizado");
+    }
+
+    @PutMapping("/fondos-pension/{id}")
+    public ResponseEntity<ApiResponse<FondoPension>> editarFondoPension(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        FondoPension entity = verificarOwnership(fondoPensionRepository, id, getEmpresaId(auth), "Fondo de pensión");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(fondoPensionRepository.save(entity), "Fondo de pensión actualizado");
+    }
+
+    @PutMapping("/fondos-cesantias/{id}")
+    public ResponseEntity<ApiResponse<FondoCesantias>> editarFondoCesantias(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        FondoCesantias entity = verificarOwnership(fondoCesantiasRepository, id, getEmpresaId(auth), "Fondo de cesantías");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(fondoCesantiasRepository.save(entity), "Fondo de cesantías actualizado");
+    }
+
+    @PutMapping("/cajas-compensacion/{id}")
+    public ResponseEntity<ApiResponse<CajaCompensacion>> editarCajaCompensacion(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        CajaCompensacion entity = verificarOwnership(cajaCompensacionRepository, id, getEmpresaId(auth), "Caja de compensación");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(cajaCompensacionRepository.save(entity), "Caja de compensación actualizada");
+    }
+
+    @PutMapping("/arl/{id}")
+    public ResponseEntity<ApiResponse<Arl>> editarArl(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        Arl entity = verificarOwnership(arlRepository, id, getEmpresaId(auth), "ARL");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(arlRepository.save(entity), "ARL actualizada");
+    }
+
+    @PutMapping("/categorias-arl/{id}")
+    public ResponseEntity<ApiResponse<CategoriaArl>> editarCategoriaArl(
+            @PathVariable Long id, @RequestBody Map<String, String> body, Authentication auth) {
+        CategoriaArl entity = verificarOwnership(categoriaArlRepository, id, getEmpresaId(auth), "Categoría ARL");
+        if (body.containsKey("nombre")) entity.setNombre(body.get("nombre"));
+        return ok(categoriaArlRepository.save(entity), "Categoría ARL actualizada");
+    }
+
+    // ====================================================================
     // HELPERS
     // ====================================================================
 
     private <T> ResponseEntity<ApiResponse<T>> ok(T data, String message) {
         return ResponseEntity.ok(ApiResponse.success(data, message));
+    }
+
+    /**
+     * Verifica que el registro pertenezca a la empresa del usuario antes de editar.
+     * Lanza excepción si es global o de otra empresa.
+     */
+    @SuppressWarnings("unchecked")
+    private <T> T verificarOwnership(
+            org.springframework.data.jpa.repository.JpaRepository<T, Long> repo,
+            Long id, Integer empresaId, String tipo) {
+        T entity = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException(tipo + " no encontrado: " + id));
+        try {
+            Integer entityEmpresaId = (Integer) entity.getClass().getMethod("getEmpresaId").invoke(entity);
+            if (entityEmpresaId == null) {
+                throw new com.data.datafacturador.exception.AccesoDenegadoException(
+                        "No se puede editar un registro global de " + tipo);
+            }
+            if (!entityEmpresaId.equals(empresaId)) {
+                throw new com.data.datafacturador.exception.AccesoDenegadoException(
+                        tipo + " no pertenece a su empresa");
+            }
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException("Error verificando propiedad del registro", e);
+        }
+        return entity;
     }
 
     /**

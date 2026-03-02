@@ -34,8 +34,8 @@ public class Retencion {
     @Column(name = "id_sucursal")
     private Long idSucursal;
 
-    @Column(name = "id_usuario")
-    private Long idUsuario;
+    @Column(name = "base_calculo")
+    private BigDecimal baseCalculo;
 
     @Column(name = "empresa_id")
     private Integer empresaId; // Nullable for Global

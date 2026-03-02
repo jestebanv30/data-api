@@ -15,9 +15,17 @@ public class Uvt {
     @Column(nullable = false)
     private Integer anio;
 
-    @Column(nullable = false)
-    private BigDecimal valor;
+    @Column(name = "valor_uvt", nullable = false)
+    private BigDecimal valorUvt;
 
-    @Column(name = "empresa_id")
-    private Integer empresaId; // Null = Global
+    @Column(name = "tope_uvt")
+    private BigDecimal topeUvt;
+
+    @Column(name = "fecha_creacion")
+    private java.time.ZonedDateTime fechaCreacion;
+
+    @PrePersist
+    public void prePersist() {
+        if (fechaCreacion == null) fechaCreacion = java.time.ZonedDateTime.now();
+    }
 }

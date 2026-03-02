@@ -92,7 +92,6 @@ public class SucursalMapper {
                 .terceroDefecto(toTerceroDTO(sucursal.getTerceroDefecto()))
                 .tipoListaPrecioDefecto(toReferenciaDTO(sucursal.getTipoLista(), sucursal.getIdListaPrecioDefecto()))
                 .imprimirQr(sucursal.getImprimirQr())
-                .buscador(sucursal.getBuscador())
                 .plan(sucursal.getPlan())
                 .planLimiteDocumentos(sucursal.getPlanLimiteDocumentos())
                 .planDocumentosEmitidos(sucursal.getPlanDocumentosEmitidos())

@@ -61,21 +61,11 @@ public class ConfiguracionAnualController {
 
     @GetMapping("/uvt")
     public ResponseEntity<Uvt> obtenerUvt(
-            @RequestParam(required = false) Integer anio,
-            Authentication authentication) {
+            @RequestParam(required = false) Integer anio) {
         if (anio == null) {
             anio = configuracionAnualService.obtenerAnioActual();
         }
-        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
-        return ResponseEntity.ok(configuracionAnualService.obtenerUvt(anio, empresaId));
-    }
-
-    @PostMapping("/uvt")
-    public ResponseEntity<Uvt> guardarUvt(
-            @RequestBody Uvt uvt,
-            Authentication authentication) {
-        Integer empresaId = obtenerEmpresaIdUsuarioAutenticado(authentication);
-        return ResponseEntity.ok(configuracionAnualService.guardarUvt(uvt, empresaId));
+        return ResponseEntity.ok(configuracionAnualService.obtenerUvt(anio));
     }
 
     // --- Retenciones ---

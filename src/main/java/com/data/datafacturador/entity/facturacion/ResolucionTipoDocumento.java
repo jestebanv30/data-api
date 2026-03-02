@@ -16,7 +16,7 @@ public class ResolucionTipoDocumento {
     private Long id;
 
     @Column(name = "id_tipo_documento", nullable = false)
-    private Long idTipoDocumento; // 1=Factura, 2=POS, 3=Nota Crédito, etc.
+    private Long idTipoDocumento; // 1=Factura, 2=Nota Crédito, 3=Nota Débito, etc.
 
     @Column(length = 10)
     private String prefijo;
@@ -36,12 +36,23 @@ public class ResolucionTipoDocumento {
     @Column(name = "fecha_hasta")
     private LocalDate fechaHasta;
 
-    private BigDecimal correlativo; // Último usado
+    /** Contador de documentos emitidos bajo esta resolución (se resetea a 0 al cambiar resolución) */
+    private BigDecimal correlativo;
+
+    /** Contador de Notas Crédito emitidas con esta resolución */
+    @Column(name = "correlativo_nc")
+    private BigDecimal correlativoNc;
+
+    /** Contador de Notas Débito emitidas con esta resolución */
+    @Column(name = "correlativo_nd")
+    private BigDecimal correlativoNd;
 
     @Column(name = "rango_alerta")
     private Long rangoAlerta; // Avisar cuando falten X números
 
-    @Column(name = "clave_tecnica", length = 255) // Ampliado por seguridad, DB dice 55 pero claves técnicas suelen ser largas HEX
+    // --- Credenciales técnicas DIAN (solo SuperAdmin puede editarlas) ---
+
+    @Column(name = "clave_tecnica", length = 255)
     private String claveTecnica;
 
     @Column(name = "testsetid", length = 255)
@@ -49,27 +60,31 @@ public class ResolucionTipoDocumento {
 
     @Column(name = "pin", length = 55)
     private String pin;
-    
+
     @Column(name = "id_software", length = 50)
     private String idSoftware;
 
-    // --- Notas Crédito / Débito (Opcional en misma tabla según schema original) ---
+    /**
+     * Indica si la resolución está en modo pruebas (Set de Pruebas DIAN).
+     * Valores: "SI" o "NO". Cuando está en "SI", los documentos van al ambiente de pruebas.
+     * Solo SuperAdmin puede activar/desactivar.
+     */
+    @Column(name = "set_pruebas", length = 10)
+    private String setPruebas; // "SI" o "NO"
+
+    // --- Prefijos de Notas (Crédito y Débito) ---
     @Column(name = "prefijo_nc", length = 10)
     private String prefijoNc;
-    
+
     @Column(name = "prefijo_nd", length = 10)
     private String prefijoNd;
 
-    // --- Auditoría y Relaciones ---
-
+    // --- Relaciones y auditoría ---
     @Column(name = "fecha_actualizacion")
     private ZonedDateTime fechaActualizacion;
-    
-    @Column(name = "id_sucursal")
-    private Long idSucursal;
 
-    @Column(name = "id_usuario")
-    private Long idUsuario; // Usuario que creó/modificó
+    @Column(name = "id_sucursal", nullable = false)
+    private Long idSucursal;
 
     @Column(name = "empresa_id")
     private Integer empresaId;
@@ -77,6 +92,6 @@ public class ResolucionTipoDocumento {
     @PrePersist
     @PreUpdate
     public void prePersist() {
-        if (fechaActualizacion == null) fechaActualizacion = ZonedDateTime.now();
+        fechaActualizacion = ZonedDateTime.now();
     }
 }

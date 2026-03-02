@@ -7,6 +7,5 @@ import java.util.Optional;
 
 @Repository
 public interface UvtRepository extends JpaRepository<Uvt, Long> {
-    Optional<Uvt> findByAnioAndEmpresaId(Integer anio, Integer empresaId);
-    Optional<Uvt> findByAnioAndEmpresaIdIsNull(Integer anio);
+    Optional<Uvt> findByAnio(Integer anio);
 }

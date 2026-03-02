@@ -148,9 +148,6 @@ public class Sucursal {
     @Column(name = "imprimir_qr", length = 55)
     private String imprimirQr;
 
-    @Column(length = 55)
-    private String buscador;
-
     @Column(name = "id_usuario")
     private Long idUsuario;
 

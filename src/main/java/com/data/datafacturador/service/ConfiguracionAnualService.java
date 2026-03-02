@@ -87,20 +87,13 @@ public class ConfiguracionAnualService {
     // --- UVT ---
 
     @Transactional(readOnly = true)
-    public Uvt obtenerUvt(Integer anio, Integer empresaId) {
-        Optional<Uvt> especifico = uvtRepository.findByAnioAndEmpresaId(anio, empresaId);
-        if (especifico.isPresent()) {
-            return especifico.get();
-        }
-        return uvtRepository.findByAnioAndEmpresaIdIsNull(anio)
+    public Uvt obtenerUvt(Integer anio) {
+        return uvtRepository.findByAnio(anio)
                 .orElseThrow(() -> new IllegalArgumentException("No se ha configurado la UVT para el año " + anio));
     }
 
     @Transactional
-    public Uvt guardarUvt(Uvt uvt, Integer empresaId) {
-        if (empresaId != null) {
-            uvt.setEmpresaId(empresaId);
-        }
+    public Uvt guardarUvt(Uvt uvt) {
         return uvtRepository.save(uvt);
     }
 
@@ -117,6 +110,7 @@ public class ConfiguracionAnualService {
         if (empresaId != null) {
             retencion.setEmpresaId(empresaId);
         }
+        calcularBaseRetencion(retencion);
         return retencionRepository.save(retencion);
     }
 
@@ -137,8 +131,23 @@ public class ConfiguracionAnualService {
         if (esSuperAdmin && retencionActualizada.getEmpresaId() != null) {
              existente.setEmpresaId(retencionActualizada.getEmpresaId());
         }
+        calcularBaseRetencion(existente);
         
         return retencionRepository.save(existente);
+    }
+
+    private void calcularBaseRetencion(Retencion retencion) {
+        if (retencion.getBaseUvt() != null) {
+            try {
+                Uvt uvtActual = obtenerUvt(obtenerAnioActual());
+                retencion.setBaseCalculo(retencion.getBaseUvt().multiply(uvtActual.getValorUvt()));
+            } catch (Exception e) {
+                // Si no hay UVT para el año actual o falta la baseUvt
+                throw new IllegalStateException("Habilitar Retención falló: " + e.getMessage());
+            }
+        } else {
+            retencion.setBaseCalculo(null);
+        }
     }
 
     @Transactional

@@ -54,5 +54,4 @@ public class SucursalRequest {
     private Long idTerceroDefecto;
     private Long idListaPrecioDefecto; // ID nuevo
     private String imprimirQr;
-    private String buscador;
 }

@@ -65,7 +65,6 @@ public class SucursalDetailResponse {
     private TerceroSimpleDTO terceroDefecto; // Antes idTerceroDefecto
     private ReferenciaDTO tipoListaPrecioDefecto; // Antes idListaPrecioDefecto
     private String imprimirQr;
-    private String buscador;
 
     // Plan
     private String plan;

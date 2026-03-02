@@ -291,7 +291,6 @@ public class EmpresaService {
 
             sucursal.setSincronizarDian(detalle.getSincronizarDian() != null ? detalle.getSincronizarDian() : 0L);
             sucursal.setImprimirQr(detalle.getImprimirQr());
-            sucursal.setBuscador(detalle.getBuscador());
             
             // Logo específico si viene
             if (detalle.getLogoBase64() != null && !detalle.getLogoBase64().isEmpty()) {
